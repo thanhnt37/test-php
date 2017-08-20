@@ -11,6 +11,7 @@ array_shift($argv);
 $routeName = array_shift($argv);
 
 include_once 'App/Models/BaseModel.php';
+include_once 'App/Models/LogModel.php';
 include_once 'App/Models/UserModel.php';
 include_once 'App/Models/WalletModel.php';
 include_once 'App/Controllers/UserControllerInterface.php';

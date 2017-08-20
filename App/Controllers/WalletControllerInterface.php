@@ -60,10 +60,12 @@ interface WalletControllerInterface
     /**
      * Transfer balance between accounts
      *
-     * @params  int     $accountSenderId
+     * @params  int     $userId
+     *          int     $accountSenderId
      *          int     $accountReceiverId
      *          int     $amount
-     * @return  boolean
+     *
+*@return  boolean
      * */
-    public function transfer($accountSenderId, $accountReceiverId, $amount);
+    public function transfer($userId, $accountSenderId, $accountReceiverId, $amount);
 }

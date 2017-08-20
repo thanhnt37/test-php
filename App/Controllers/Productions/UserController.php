@@ -9,6 +9,7 @@
 namespace App\Controllers\Productions;
 
 use App\Controllers\UserControllerInterface;
+use App\Models\LogModel;
 use App\Models\UserModel;
 use App\Models\WalletModel;
 
@@ -96,6 +97,10 @@ class UserController implements UserControllerInterface
         );
 
         echo "Successfully to set Deposit limit = $amount for user with id = $userId \n";
+
+        $logModel = new LogModel();
+        $logModel->create("User Id $userId change deposit limit to $amount");
+        
         return;
     }
 
@@ -128,6 +133,10 @@ class UserController implements UserControllerInterface
         );
 
         echo "Successfully to set Withdrawal limit = $amount for user with id = $userId \n";
+
+        $logModel = new LogModel();
+        $logModel->create("User Id $userId change withdrawal limit to $amount");
+
         return;
     }
 }

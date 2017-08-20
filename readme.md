@@ -83,10 +83,11 @@
 
 - To transfer balance between 2 account
 
-        php index.php transfer `$accountSenderId` `$accountReceiverId` `$amount`
+        php index.php transfer `$userId` $accountSenderId` `$accountReceiverId` `$amount`
 
+        # $userId            int     id of user
         # $accountSenderId   int     id of account sender
         # $accountReceiverId int     id of account will receive the balance
         # $amount            int     transfer number
 
-        ex: php index.php transfer 1 4 200
+        ex: php index.php transfer 1 2 4 200

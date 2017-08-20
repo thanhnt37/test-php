@@ -9,6 +9,7 @@
 namespace App\Controllers\Productions;
 
 use App\Controllers\WalletControllerInterface;
+use App\Models\LogModel;
 use App\Models\UserModel;
 use App\Models\WalletModel;
 
@@ -50,6 +51,9 @@ class WalletController implements WalletControllerInterface
         );
 
         echo $response['message'];
+
+        $logModel = new LogModel();
+        $logModel->create("User Id $userId create new account " . json_decode($response['data'], true)['id']);
     }
 
     /**
@@ -91,6 +95,10 @@ class WalletController implements WalletControllerInterface
         );
 
         echo "Successfully to set Default account with currency '" . json_decode($wallet['data'], true)['currency'] . "' for user id = $userId \n";
+
+        $logModel = new LogModel();
+        $logModel->create("User Id $userId set account with id = $accountId to default");
+
         return;
     }
 
@@ -133,6 +141,10 @@ class WalletController implements WalletControllerInterface
         );
 
         echo "Successfully to Freeze account with currency '" . json_decode($wallet['data'], true)['currency'] . "' for user id = $userId \n";
+
+        $logModel = new LogModel();
+        $logModel->create("User Id $userId freeze account with id = $accountId");
+
         return;
     }
 
@@ -180,6 +192,10 @@ class WalletController implements WalletControllerInterface
 
         echo "Successfully to Deposit $amount " . $wallet['currency'] . " to Account $accountId \n";
         echo "Current balance: " . json_decode($response['data'], true)['amount'] . ' ' . json_decode($response['data'], true)['currency'] . " \n";
+
+        $logModel = new LogModel();
+        $logModel->create("User Id $userId deposit $amount to account with id = $accountId");
+
         return;
     }
 
@@ -231,6 +247,10 @@ class WalletController implements WalletControllerInterface
 
         echo "Successfully to Withdrawal $amount " . $wallet['currency'] . " from Account $accountId \n";
         echo "Current balance: " . json_decode($response['data'], true)['amount'] . ' ' . json_decode($response['data'], true)['currency'] . " \n";
+
+        $logModel = new LogModel();
+        $logModel->create("User Id $userId withdrawal $amount from account with id = $accountId");
+
         return;
     }
 
@@ -242,12 +262,20 @@ class WalletController implements WalletControllerInterface
      *          int     $amount
      * @return  boolean
      * */
-    public function transfer($accountSenderId, $accountReceiverId, $amount)
+    public function transfer($userId, $accountSenderId, $accountReceiverId, $amount)
     {
-        if( !isset($accountSenderId) || !is_numeric($accountSenderId) || !isset($accountReceiverId) || !is_numeric($accountReceiverId) || !isset($amount) || !is_numeric($amount) ) {
+        if( !isset($userId) || !isset($accountSenderId) || !is_numeric($accountSenderId) || !isset($accountReceiverId) || !is_numeric($accountReceiverId) || !isset($amount) || !is_numeric($amount) ) {
             echo "Error, Parameters is invalid \n";
             return;
         }
+
+        $userModel = new UserModel();
+        $user = $userModel->findById($userId);
+        if( $user['code'] != 200 ) {
+            echo $user['message'];
+            return;
+        }
+        $user = json_decode($user['data'], true);
 
         $walletModel = new WalletModel();
         $walletSender = $walletModel->findById($accountSenderId);
@@ -256,6 +284,10 @@ class WalletController implements WalletControllerInterface
             return;
         }
         $walletSender = json_decode($walletSender['data'], true);
+
+        if( $walletSender['user_id'] != $user['id'] ) {
+            echo "Sorry, User id $userId is not owner of account $accountSenderId\n";
+        }
 
         $walletReceiver = $walletModel->findById($accountReceiverId);
         if( $walletReceiver['code'] != 200 ) {
@@ -292,6 +324,10 @@ class WalletController implements WalletControllerInterface
         echo "Successfully to transfer $amount " . $sender['currency'] . " from Account $accountSenderId to $accountReceiverId \n";
         echo "Current balance of Account $accountSenderId: " . $sender['amount'] . ' ' . $sender['currency'] . " \n";
         echo "Current balance of Account $accountReceiverId: " . $receiver['amount'] . ' ' . $receiver['currency'] . " \n";
+
+        $logModel = new LogModel();
+        $logModel->create("User Id $userId transfer $amount " . $sender['currency'] . " from account_id = $accountSenderId to account_id = $accountReceiverId");
+        
         return;
     }
 }
